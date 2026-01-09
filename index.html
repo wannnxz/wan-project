@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>WAN PROJECT</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:monospace}
+html,body{width:100%;height:100%;overflow:hidden}
+
+/* WALLPAPER DARI LINK */
+body{
+  background:
+    linear-gradient(rgba(10,0,21,.85),rgba(10,0,21,.85)),
+    url("https://img.sanishtech.com/u/5d53e56285ae9dc56790c73ca316e2e2.jpg")
+    center/cover no-repeat fixed;
+  color:#d9b8ff;
+}
+
+/* PAGE SYSTEM */
+.page{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+.page.active{display:flex}
+
+/* BOX */
+.box{
+  width:88%;
+  max-width:380px;
+  padding:22px;
+  background:#130021;
+  border:2px solid #7a2cff;
+  box-shadow:0 0 30px #5e00ff;
+  text-align:center;
+}
+
+h2{color:#c084ff;margin-bottom:12px}
+
+/* INPUT & BUTTON */
+input,button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  background:black;
+  border:1px solid #7a2cff;
+  color:#d9b8ff;
+  font-size:16px;
+}
+button{background:#5e00ff;color:white}
+.menu-btn{background:#2a004d}
+
+/* ERROR */
+.error{color:#ff5555;margin-top:10px}
+
+/* PLEASE WAIT */
+.wait-text{
+  font-size:18px;
+  letter-spacing:2px;
+  animation:flicker 1.2s infinite;
+}
+@keyframes flicker{
+  0%{opacity:1}
+  50%{opacity:.4}
+  100%{opacity:1}
+}
+.loader{
+  margin-top:15px;
+  font-size:14px;
+  color:#aaa;
+}
+.dots::after{
+  content:'';
+  animation:dots 1.5s infinite;
+}
+@keyframes dots{
+  0%{content:''}
+  33%{content:'.'}
+  66%{content:'..'}
+  100%{content:'...'}
+}
+
+/* POPUP */
+#popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+.popup-box{
+  width:80%;
+  max-width:300px;
+  padding:20px;
+  background:#130021;
+  border:2px solid #7a2cff;
+  box-shadow:0 0 20px #7a2cff;
+  text-align:center;
+}
+.success{color:#00ff9c}
+.fail{color:#ff4444}
+
+/* FOOTER */
+.footer{
+  position:fixed;
+  bottom:6px;
+  width:100%;
+  text-align:center;
+  font-size:11px;
+  color:gray;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" class="page active">
+  <div class="box">
+    <h2>SECURE ACCESS</h2>
+    <input id="username" placeholder="Username" enterkeyhint="next">
+    <input id="password" type="password" placeholder="Password" enterkeyhint="done">
+    <button onclick="doLogin()">ENTER</button>
+    <div id="loginError" class="error" style="display:none">❌ Invalid credentials</div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="homePage" class="page">
+  <div class="box">
+    <h2>WAN PROJECT MENU</h2>
+    <button class="menu-btn" onclick="openAction('Bug WhatsApp')">Bug WhatsApp</button>
+    <button class="menu-btn" onclick="openAction('Banned WhatsApp')">Banned WhatsApp</button>
+    <button class="menu-btn" onclick="openAction('Unbanned WhatsApp')">Unbanned WhatsApp</button>
+    <button class="menu-btn" onclick="openAction('Crash UI')">Crash UI</button>
+    <button class="menu-btn" onclick="openAction('Send Malware')">Send Malware</button>
+    <button class="menu-btn" onclick="alert('PAIRING MODE SOON')">Create WhatsApp Bot</button>
+  </div>
+</div>
+
+<!-- ACTION -->
+<div id="actionPage" class="page">
+  <div class="box">
+    <h2 id="actionTitle"></h2>
+    Nomor target:
+    <input id="target" placeholder="+62xxxxxx">
+    <button onclick="sendProcess()">SEND</button>
+  </div>
+</div>
+
+<!-- PLEASE WAIT -->
+<div id="waitPage" class="page">
+  <div class="box">
+    <div class="wait-text">PLEASE WAIT</div>
+    <div class="loader">Processing<span class="dots"></span></div>
+  </div>
+</div>
+
+<!-- POPUP -->
+<div id="popup">
+  <div class="popup-box">
+    <div id="popupText"></div>
+    <button style="margin-top:15px" onclick="backHome()">Back to Home Page</button>
+  </div>
+</div>
+
+<div class="footer">WAN PROJECT V 1.3</div>
+
+<script>
+const loginPage=document.getElementById("loginPage");
+const homePage=document.getElementById("homePage");
+const actionPage=document.getElementById("actionPage");
+const waitPage=document.getElementById("waitPage");
+const popup=document.getElementById("popup");
+const popupText=document.getElementById("popupText");
+const usernameInput=document.getElementById("username");
+const passwordInput=document.getElementById("password");
+const loginError=document.getElementById("loginError");
+const actionTitle=document.getElementById("actionTitle");
+
+/* PAGE SWITCH */
+function show(p){
+  [loginPage,homePage,actionPage,waitPage].forEach(x=>x.classList.remove("active"));
+  p.classList.add("active");
+}
+
+/* LOGIN */
+function doLogin(){
+  if(usernameInput.value.toLowerCase()==="wann" && passwordInput.value==="mie ayam"){
+    show(homePage);
+  }else{
+    loginError.style.display="block";
+    navigator.vibrate && navigator.vibrate(200);
+  }
+}
+
+/* ENTER KEY */
+passwordInput.addEventListener("keydown",e=>{
+  if(e.key==="Enter") doLogin();
+});
+
+/* MENU */
+function openAction(t){
+  actionTitle.innerText=t;
+  show(actionPage);
+}
+
+/* SEND */
+function sendProcess(){
+  show(waitPage);
+  const delay=4000+Math.random()*2000;
+  setTimeout(()=>{
+    popup.style.display="flex";
+    const ok=Math.random()<0.5;
+    popupText.innerHTML=ok
+      ? "<h3 class='success'>DONE 😈✅</h3><br>Process completed"
+      : "<h3 class='fail'>FAILED ❎</h3><br>Unknown error";
+  },delay);
+}
+
+/* BACK HOME */
+function backHome(){
+  popup.style.display="none";
+  show(homePage);
+}
+</script>
+
+</body>
+</html>
